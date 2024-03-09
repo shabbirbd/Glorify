@@ -10,10 +10,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { defaultValues } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import defaultValues from "../../constants/index";
 
 const formSchema = z.object({
   title: z.string(),
@@ -54,7 +54,7 @@ const TransformationForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="username"
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>

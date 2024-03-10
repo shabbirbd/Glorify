@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import {
   aspectRatioOptions,
+  creditFee,
   defaultValues,
   transformationTypes,
 } from "@/constants";
@@ -18,12 +19,13 @@ import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCldImageUrl } from "next-cloudinary";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { CustomField } from "./CustomField";
+import { InsufficientCreditsModal } from "./InsufficientCreditsModal";
 import MediaUploder from "./MediaUploder";
 import TransformedImage from "./TransformedImage";
 
@@ -180,13 +182,20 @@ const TransformationForm = ({
     setNewTransformation(null);
     // TODO:
     startTransition(async () => {
-      await updateCredits(userId, -1);
+      await updateCredits(userId, creditFee);
     });
   };
+
+  useEffect(() => {
+    if (image && (type === "restore" || type === "removeBackground")) {
+      setNewTransformation(transformationType.config);
+    }
+  }, [image, transformationType.config, type]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />}
         <CustomField
           control={form.control}
           name="title"

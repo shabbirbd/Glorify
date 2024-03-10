@@ -20,6 +20,7 @@ import { z } from "zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { CustomField } from "./CustomField";
+import MediaUploder from "./MediaUploder";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -111,7 +112,7 @@ const TransformationForm = ({
     );
 
     setNewTransformation(null);
-
+    // TODO:
     startTransition(async () => {
       // await updateCredits(userId, creditFee)
     });
@@ -203,6 +204,23 @@ const TransformationForm = ({
             )}
           </div>
         )}
+
+        <div className="media-uploader-field">
+          <CustomField
+            control={form.control}
+            name="publicId"
+            className="flex size-full flex-col"
+            render={({ field }) => (
+              <MediaUploder
+                onValueChange={field.onChange}
+                setImage={setImage}
+                publicId={field.value}
+                image={image}
+                type={type}
+              />
+            )}
+          />
+        </div>
 
         <div className="flex flex-col gap-4">
           <Button

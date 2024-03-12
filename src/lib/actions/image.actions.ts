@@ -1,6 +1,5 @@
 "use server";
 
-import { v2 as cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import Image from "../database/models/image.model";
@@ -8,11 +7,13 @@ import User from "../database/models/user.model";
 import { connectToDB } from "../database/mongoose";
 import { handleError } from "../utils";
 
+import { v2 as cloudinary } from "cloudinary";
+
 const populateUser = (query: any) =>
   query.populate({
     path: "author",
     model: User,
-    select: "_id firstName lastName",
+    select: "_id firstName lastName clerkId",
   });
 
 // ADD IMAGE
@@ -47,7 +48,7 @@ export async function updateImage({ image, userId, path }: UpdateImageParams) {
     const imageToUpdate = await Image.findById(image._id);
 
     if (!imageToUpdate || imageToUpdate.author.toHexString() !== userId) {
-      throw new Error("Unauthorized or Image not found");
+      throw new Error("Unauthorized or image not found");
     }
 
     const updatedImage = await Image.findByIdAndUpdate(
@@ -69,7 +70,7 @@ export async function deleteImage(imageId: string) {
   try {
     await connectToDB();
 
-    await Image.findByIdAndUpdate(imageId);
+    await Image.findByIdAndDelete(imageId);
   } catch (error) {
     handleError(error);
   } finally {
@@ -84,9 +85,7 @@ export async function getImageById(imageId: string) {
 
     const image = await populateUser(Image.findById(imageId));
 
-    if (!image) {
-      throw new Error("Image not found");
-    }
+    if (!image) throw new Error("Image not found");
 
     return JSON.parse(JSON.stringify(image));
   } catch (error) {
@@ -115,6 +114,7 @@ export async function getAllImages({
     });
 
     let expression = "folder=glorify";
+
     if (searchQuery) {
       expression += ` AND ${searchQuery}`;
     }
@@ -143,13 +143,43 @@ export async function getAllImages({
       .limit(limit);
 
     const totalImages = await Image.find(query).countDocuments();
-
     const savedImages = await Image.find().countDocuments();
 
     return {
       data: JSON.parse(JSON.stringify(images)),
-      totalPages: Math.ceil(totalImages / limit),
+      totalPage: Math.ceil(totalImages / limit),
       savedImages,
+    };
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// GET IMAGES BY USER
+export async function getUserImages({
+  limit = 9,
+  page = 1,
+  userId,
+}: {
+  limit?: number;
+  page: number;
+  userId: string;
+}) {
+  try {
+    await connectToDB();
+
+    const skipAmount = (Number(page) - 1) * limit;
+
+    const images = await populateUser(Image.find({ author: userId }))
+      .sort({ updatedAt: -1 })
+      .skip(skipAmount)
+      .limit(limit);
+
+    const totalImages = await Image.find({ author: userId }).countDocuments();
+
+    return {
+      data: JSON.parse(JSON.stringify(images)),
+      totalPages: Math.ceil(totalImages / limit),
     };
   } catch (error) {
     handleError(error);

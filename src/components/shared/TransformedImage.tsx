@@ -30,6 +30,8 @@ const TransformedImage = ({
     );
   };
 
+  console.log(isTransforming);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex-between">
@@ -50,6 +52,17 @@ const TransformedImage = ({
 
       {image?.publicId && transformationConfig ? (
         <div className="relative">
+          {isTransforming && (
+            <div className="transformation-loader">
+              <Image
+                src="/assets/icons/spinner.svg"
+                alt="Spinner"
+                width={50}
+                height={50}
+              />
+              <p className="text-white/80">Please wait...</p>
+            </div>
+          )}
           <CldImage
             width={getImageSize(type, image, "width")}
             height={getImageSize(type, image, "height")}
@@ -68,18 +81,6 @@ const TransformedImage = ({
             }}
             {...transformationConfig}
           />
-
-          {isTransforming && (
-            <div className="transformation-loader">
-              <Image
-                src="/assets/icons/spinner.svg"
-                alt="Spinner"
-                width={50}
-                height={50}
-              />
-              <p className="text-white/80">Please wait...</p>
-            </div>
-          )}
         </div>
       ) : (
         <div className="transformed-placeholder">Transformed Image</div>

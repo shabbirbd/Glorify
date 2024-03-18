@@ -30,8 +30,6 @@ const TransformedImage = ({
     );
   };
 
-  console.log(isTransforming);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex-between">

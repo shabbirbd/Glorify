@@ -24,11 +24,11 @@ Link to a live demo: [Live Demo](https://glorify-liart.vercel.app/)
 
 ## Tech Stack
 
-**Client:** React, Next.js, TailwindCSS, Shadcn ui
-**Server:** Next.js, MongoDB, Mongoose
-**Auth:** Clerk
-**AI:** Cloudinary
-**Payment:** Stripe
+- **Client:** React, Next.js, TailwindCSS, Shadcn ui
+- **Server:** Next.js, MongoDB, Mongoose
+- **Auth:** Clerk
+- **AI:** Cloudinary
+- **Payment:** Stripe
 
 ## Usage
 
